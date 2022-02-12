@@ -1,90 +1,90 @@
-% ‰Šú‰»
+% åˆæœŸåŒ–
 clc; clear all;
 
-% ƒOƒ[ƒoƒ‹•Ï”éŒ¾
+% ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°å®£è¨€
 global dt n ita L x y
 
-% ƒpƒ‰ƒ[ƒ^[
-L = 10;% ŒvZ—Ìˆæ
-n = 30;% —v‘f”
-dL = L / n;% —v‘fƒTƒCƒY
-c = 1;% ”ä”M
-rho = 1;% –§“x
-k = 1;% ”M“`“±—¦
-alpha = k / (c * rho);% ”MŠgU—¦
+% ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ãƒ¼
+L = 10;% è¨ˆç®—é ˜åŸŸ
+n = 30;% è¦ç´ æ•°
+dL = L / n;% è¦ç´ ã‚µã‚¤ã‚º
+c = 1;% æ¯”ç†±
+rho = 1;% å¯†åº¦
+k = 1;% ç†±ä¼å°ç‡
+alpha = k / (c * rho);% ç†±æ‹¡æ•£ç‡
 
-t_total = 10;% SIMŒvZŠÔ
-dt = 0.01;% ƒ^ƒCƒ€ƒXƒeƒbƒv
-ita = t_total / dt;% ”½•œ”
+t_total = 10;% SIMè¨ˆç®—æ™‚é–“
+dt = 0.01;% ã‚¿ã‚¤ãƒ ã‚¹ãƒ†ãƒƒãƒ—
+ita = t_total / dt;% åå¾©æ•°
 
-% À•W‚Ì¶¬
+% åº§æ¨™ã®ç”Ÿæˆ
 x = 0 : L / n : L;
 y = L : - L / n : 0;
 [X, Y] = meshgrid(x, y);
 
-% ”z—ñŠm•Û
+% é…åˆ—ç¢ºä¿
 T2d = zeros(n, n, ita);
 wall_2d = zeros(n, n);
 
-% ”M‹«ŠEğŒ
-T1 = 100;% –k‘¤
-T2 = 0;% “Œ‘¤
-T3 = 0;% “ì‘¤
-T4 = 0;% ¼‘¤
+% ç†±å¢ƒç•Œæ¡ä»¶
+T1 = 100;% åŒ—å´
+T2 = 0;% æ±å´
+T3 = 0;% å—å´
+T4 = 0;% è¥¿å´
 
-% ‹«ŠEğŒ‚ğİ’è‚Æs—ñ‚Ìì¬
+% å¢ƒç•Œæ¡ä»¶ã‚’è¨­å®šã¨è¡Œåˆ—ã®ä½œæˆ
 [T2d, wall_2d] = DefineWall(T2d, wall_2d, T1, T2, T3, T4);
 
-% ‰·“xƒxƒNƒgƒ‹‚Ì\’z
+% æ¸©åº¦ãƒ™ã‚¯ãƒˆãƒ«ã®æ§‹ç¯‰
 T1d = zeros(n * n, ita);
 for i = 1 : ita
-    T1d(:, i) = reshape(T2d(:, :, i).', [n * n, 1]);% ƒŠƒVƒFƒCƒv‚Ì‘O‚É“]’u‚µ‚Ä‚¨‚­
+    T1d(:, i) = reshape(T2d(:, :, i).', [n * n, 1]);% ãƒªã‚·ã‚§ã‚¤ãƒ—ã®å‰ã«è»¢ç½®ã—ã¦ãŠã
 end
 wall_1d = reshape(wall_2d.', [n * n, 1]);
 
-% ŠÔ”­“Ws—ñ‚Ì\’z
+% æ™‚é–“ç™ºå±•è¡Œåˆ—ã®æ§‹ç¯‰
 A = TransitionMatrix(wall_1d, alpha, dL);
 
-% ŠÔ”­“W
+% æ™‚é–“ç™ºå±•
 for i = 2 : ita
     
-    % ŠÔ”­“W
+    % æ™‚é–“ç™ºå±•
     T1d(:, i) = A * T1d(:, i - 1);
     T2d(:, :, i) = (reshape(T1d(:, i), [n, n])).';
     
-    % ƒRƒ}ƒ“ƒhƒEƒBƒ“ƒhƒE‚Ö‚Ìo—Í
+    % ã‚³ãƒãƒ³ãƒ‰ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã¸ã®å‡ºåŠ›
     txt = ['ita = ',num2str(i),' / ',num2str(ita)];
     disp(txt);
     
-    % ‰Â‹‰»
+    % å¯è¦–åŒ–
     vis_contour('temp.gif', i, T2d(:, :, i), 0, 100, 1);
     
 end
 
-%% ˆÈ‰ºŠÖ”
+%% ä»¥ä¸‹é–¢æ•°
 
 function[T2d, wall_2d] = DefineWall(T2d, wall_2d, T1, T2, T3, T4)
 
-% ƒOƒ[ƒoƒ‹•Ï”ŒÄ‚Ño‚µ
+% ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°å‘¼ã³å‡ºã—
 global n
 
-% •Çs—ñ
+% å£è¡Œåˆ—
 % 1|2|3
 % 8|0|4
 % 7|6|5
 
 for j = 1 : n
     for i = 1 : n
-        if i == 1 && j == 1% ¶ã
+        if i == 1 && j == 1% å·¦ä¸Š
             T2d(i, j, :) = T1;
             wall_2d(i, j) = 1;
-        elseif i == 1 && j == n% ‰Eã
+        elseif i == 1 && j == n% å³ä¸Š
             T2d(i, j, :) = T1;
             wall_2d(i, j) = 3;
-        elseif i == n && j == n% ‰E‰º
+        elseif i == n && j == n% å³ä¸‹
             T2d(i, j, :) = T3;
             wall_2d(i, j) = 5;
-        elseif i == n && j == 1% ¶‰º
+        elseif i == n && j == 1% å·¦ä¸‹
             T2d(i, j, :) = T3;
             wall_2d(i, j) = 7;
         elseif i == 1
@@ -108,37 +108,37 @@ end
 
 function[A] = TransitionMatrix(wall_1d, alpha, dL)
 
-% ƒOƒ[ƒoƒ‹•Ï”ŒÄ‚Ño‚µ
+% ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°å‘¼ã³å‡ºã—
 global n dt
 
-% •Çs—ñ
+% å£è¡Œåˆ—
 % 1|2|3
 % 8|0|4
 % 7|6|5
 
 A = zeros(n * n, n * n);
 for i = 1 : n * n
-    if wall_1d(i, 1) == 1% Šp‚Í“ñ‚Â‚Ì‹«ŠEğŒ‚Ì•½‹Ï‚ğ‚Æ‚éB
+    if wall_1d(i, 1) == 1% è§’ã¯äºŒã¤ã®å¢ƒç•Œæ¡ä»¶ã®å¹³å‡ã‚’ã¨ã‚‹ã€‚
         A(i, i + 1) = 1 / 2;
         A(i, i + n) = 1 / 2;
-    elseif wall_1d(i, 1) == 2% –k‘¤•Ç
+    elseif wall_1d(i, 1) == 2% åŒ—å´å£
         A(i, i) = 1;
-    elseif wall_1d(i, 1) == 3% Šp‚Í“ñ‚Â‚Ì‹«ŠEğŒ‚Ì•½‹Ï‚ğ‚Æ‚éB
+    elseif wall_1d(i, 1) == 3% è§’ã¯äºŒã¤ã®å¢ƒç•Œæ¡ä»¶ã®å¹³å‡ã‚’ã¨ã‚‹ã€‚
         A(i, i - 1) = 1 / 2;
         A(i, i + n) = 1 / 2;
-    elseif wall_1d(i, 1) == 4% “Œ‘¤•Ç
+    elseif wall_1d(i, 1) == 4% æ±å´å£
         A(i, i) = 1;
-    elseif wall_1d(i, 1) == 5% Šp‚Í“ñ‚Â‚Ì‹«ŠEğŒ‚Ì•½‹Ï‚ğ‚Æ‚éB
+    elseif wall_1d(i, 1) == 5% è§’ã¯äºŒã¤ã®å¢ƒç•Œæ¡ä»¶ã®å¹³å‡ã‚’ã¨ã‚‹ã€‚
         A(i, i - 1) = 1 / 2;
         A(i, i - n) = 1 / 2;
-    elseif wall_1d(i, 1) == 6% “ì‘¤•Ç
+    elseif wall_1d(i, 1) == 6% å—å´å£
         A(i, i) = 1;
-    elseif wall_1d(i, 1) == 7% Šp‚Í“ñ‚Â‚Ì‹«ŠEğŒ‚Ì•½‹Ï‚ğ‚Æ‚é
+    elseif wall_1d(i, 1) == 7% è§’ã¯äºŒã¤ã®å¢ƒç•Œæ¡ä»¶ã®å¹³å‡ã‚’ã¨ã‚‹
         A(i, i + 1) = 1 / 2;
         A(i, i - n) = 1 / 2;
-    elseif wall_1d(i, 1) == 8% ¼‘¤•Ç
+    elseif wall_1d(i, 1) == 8% è¥¿å´å£
         A(i, i) = 1;
-    elseif wall_1d(i, 1) == 0% •Ç‚Å‚È‚¢‚È‚ç‚Î
+    elseif wall_1d(i, 1) == 0% å£ã§ãªã„ãªã‚‰ã°
         A(i, i) = 1 - 4 * dt * alpha / dL^2;
         A(i, i - 1) = dt * alpha / dL^2;
         A(i, i + 1) = dt * alpha / dL^2;
@@ -151,19 +151,19 @@ end
 
 function[] = vis_contour(filename, timestep, u, maxrange, minrange, fignum)
 
-% ƒOƒ[ƒoƒ‹•Ï”ŒÄ‚Ño‚µ
+% ã‚°ãƒ­ãƒ¼ãƒãƒ«å¤‰æ•°å‘¼ã³å‡ºã—
 global dt L x y
 
 figure(fignum);
 h = imagesc(x, y, u);
 
-h.AlphaData = isfinite(u); % NaN‚âInf‚ğ“§–¾‚É‚·‚é
+h.AlphaData = isfinite(u); % NaNã‚„Infã‚’é€æ˜ã«ã™ã‚‹
 title(['time = ', num2str(timestep * dt, '%.3f')]);
 set(gca, 'FontName', 'Times New Roman', 'FontSize', 16);
 axis equal; axis tight; axis on;
 xlabel('x')
 ylabel('y')
-view(0, 270); % ‹“_‚Ìİ’è
+view(0, 270); % è¦–ç‚¹ã®è¨­å®š
 
 xticks(0 : round(L / 5) : L);
 yticks(0 : round(L / 5) : L);
