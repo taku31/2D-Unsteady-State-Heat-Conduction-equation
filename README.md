@@ -1,1 +1,1 @@
-# heat_conduction_eq2d
+#  2D Unsteady State Heat Conduction equation
